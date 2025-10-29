@@ -97,4 +97,463 @@
             transition: all 0.2s ease-in-out;
             font-weight: 500; /* Texto del recuadro semi-bold */
             color: var(--color-text-primary);
-        }... (Tiempo restante: 23 KB)
+        }
+
+        /* Hover del recuadro */
+        .sipoc-item:hover {
+            background-color: #eef7ff; /* light blue */
+            border-color: var(--color-primary);
+            z-index: 10; /* Traer al frente */
+        }
+
+        /* Tooltip de definición (el que aparece al lado) */
+        .sipoc-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background-color: var(--color-primary-dark);
+            color: #fff;
+            text-align: left;
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.75rem 1rem; /* p-3 p-4 */
+            position: absolute;
+            z-index: 20;
+            width: 300px; /* Ancho para la definición */
+            max-width: 90vw; /* Límite en pantallas pequeñas */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: none;
+            transition: opacity 0.3s, visibility 0.3s;
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 400; /* Peso normal para la definición */
+            
+            /* --- Posición por defecto (MÓVIL): ARRIBA --- */
+            left: 50%; 
+            bottom: 115%; /* Un poco más cerca que el tooltip del título */
+            top: auto;
+            transform: translateX(-50%);
+        }
+
+        /* REGLA CORREGIDA: Mostrar el tooltip al hacer hover en el item */
+        .sipoc-item:hover .sipoc-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Flecha del tooltip (MÓVIL): Apunta ARRIBA */
+        .sipoc-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Abajo del tooltip */
+            left: 50%;
+            right: auto;
+            margin-top: 0;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--color-primary-dark) transparent transparent transparent; /* Flecha apunta arriba */
+        }
+        
+        /* --- Reglas para PANTALLA GRANDE (lg) --- */
+        @media (min-width: 1024px) {
+            /* Posición del tooltip a la DERECHA */
+            .sipoc-tooltip {
+                left: 102%;
+                right: auto;
+                top: 50%;
+                bottom: auto;
+                transform: translateY(-50%);
+                max-width: 300px;
+            }
+
+            /* Flecha del tooltip a la IZQUIERDA (apunta a la derecha) */
+            .sipoc-tooltip::after {
+                top: 50%;
+                left: auto;
+                right: 100%; /* A la izquierda del tooltip */
+                margin-top: -6px;
+                margin-left: 0;
+                border-color: transparent var(--color-primary-dark) transparent transparent;
+            }
+
+            /* Fallback para tooltips en columnas 4 y 5 (Posición a la IZQUIERDA) */
+            .lg\:grid-cols-5 > :nth-child(4) .sipoc-item:hover .sipoc-tooltip,
+            .lg\:grid-cols-5 > :nth-child(5) .sipoc-item:hover .sipoc-tooltip {
+                left: auto;
+                right: 102%; /* Posición a la izquierda */
+            }
+            
+            /* Flecha para tooltips en columnas 4 y 5 (a la DERECHA, apunta a la izquierda) */
+            .lg\:grid-cols-5 > :nth-child(4) .sipoc-item:hover .sipoc-tooltip::after,
+            .lg\:grid-cols-5 > :nth-child(5) .sipoc-item:hover .sipoc-tooltip::after {
+                right: auto;
+                left: 100%; /* A la derecha del tooltip */
+                border-color: transparent transparent transparent var(--color-primary-dark);
+            }
+        }
+
+        /* Título dentro del tooltip (ej. "Recursos Financieros:") */
+        .sipoc-tooltip b {
+            color: var(--color-accent-yellow-light);
+            font-weight: 700;
+        }
+
+        /* Resetear estilos de lista (ya no son viñetas) */
+        .content-sub-card ul, .content-sub-card ol {
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="main-header text-center p-10 rounded-lg mb-8 shadow-lg">
+            <img src="https://www.laflorida.cl/sitio/wp-content/uploads/2024/05/header_laflorida_2024.png" alt="Logo Ilustre Municipalidad de La Florida 2024" class="header-logo mx-auto">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2 text-shadow">Infograma SIPOC</h1>
+            <p class="text-xl md:text-2xl text-shadow highlight-text">Programas Comunitarios Municipales 2025</p>
+            <p class="max-w-4xl mx-auto mt-4 text-base opacity-90">Análisis de Proveedores, Entradas, Procesos, Salidas y Clientes de los programas clave de la Municipalidad de La Florida.</p>
+        </header>
+        
+        <main class="content-card">
+            <div class="tabs" role="tablist" aria-label="Navegación de Secciones SIPOC">
+                <!-- Pestaña 1: Consolidado -->
+                <button role="tab" aria-selected="true" aria-controls="consolidado-panel" id="consolidado-tab" class="tab-link active" data-tab="consolidado">
+                    SIPOC Consolidado
+                </button>
+                <!-- Pestaña 2: Adulto Mayor -->
+                <button role="tab" aria-selected="false" aria-controls="adulto-mayor-panel" id="adulto-mayor-tab" class="tab-link" data-tab="adulto-mayor">
+                    Adulto Mayor
+                </button>
+                <!-- Pestaña 3: OLN -->
+                <button role="tab" aria-selected="false" aria-controls="oln-panel" id="oln-tab" class="tab-link" data-tab="oln">
+                    Oficina Local de la Niñez (OLN)
+                </button>
+                <!-- Pestaña 4: CDM -->
+                <button role="tab" aria-selected="false" aria-controls="cdm-panel" id="cdm-tab" class="tab-link" data-tab="cdm">
+                    Centro de la Mujer (CDM)
+                </button>
+                <!-- Pestaña 5: Centro del Cariño -->
+                <button role="tab" aria-selected="false" aria-controls="cariño-panel" id="cariño-tab" class="tab-link" data-tab="cariño">
+                    Centro del Cariño
+                </button>
+                <!-- Pestaña 6: Apoyo a Víctimas -->
+                <button role="tab" aria-selected="false" aria-controls="victimas-panel" id="victimas-tab" class="tab-link" data-tab="victimas">
+                    Apoyo a Víctimas
+                </button>
+            </div>
+
+            <!-- Panel 1: SIPOC Consolidado (Activo por defecto) -->
+            <div id="consolidado-panel" role="tabpanel" aria-labelledby="consolidado-tab" class="tab-content active">
+                <section>
+                    <h2 class="section-title text-center">SIPOC Consolidado</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <!-- S: PROVEEDORES -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">S: Proveedores 🏛️</h3>
+                                <span class="tooltip-text"><b>(Supplier)</b> Quien suministra los recursos o insumos clave para el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Organizaciones que proporcionan los recursos.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Financiamiento Municipal<span class="sipoc-tooltip"><b>Financiamiento Municipal:</b> Aporte íntegro o parcial de la Municipalidad de La Florida para todos los proyectos (ej. AM, CAD, VDV, CC, SM, Juventud, Infancia, OLN, CDM, MJH)</span></li>
+                                <li class="sipoc-item">Financiamiento Externo<span class="sipoc-tooltip"><b>Financiamiento Externo:</b> Ministerio de Desarrollo Social y Familia (MDSF) (PV) y SernamEG (CDM, MJH).</span></li>
+                                <li class="sipoc-item">Recursos Humanos Especializados<span class="sipoc-tooltip"><b>Recursos Humanos Especializados:</b> Psicólogos, Trabajadores Sociales, Abogados, Monitores Comunitarios, Talleristas, Gestores Territoriales y Gestores de Caso.</span></li>
+                                <li class="sipoc-item">Redes de Coordinación Interna<span class="sipoc-tooltip"><b>Redes de Coordinación Interna:</b> DIDECOSO, Dirección de Seguridad Ciudadana (RPM 1416), OMIL, Centro de la Mujer, Programas COMUDEF (Fin de Vida, Cuidados Paliativos).</span></li>
+                                <li class="sipoc-item">Redes de Colaboración Externa<span class="sipoc-tooltip"><b>Redes de Colaboración Externa:</b> SernamEG, MDSF, Tribunales de Familia, Carabineros, Hospital, Centros Educativos/Universidades, Proveedores de Servicios.</span></li>
+                            </ul>
+                        </div>
+            
+                        <!-- I: ENTRADAS -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">I: Entradas 📥</h3>
+                                <span class="tooltip-text"><b>(Input)</b> Los recursos, materiales o información que se transforman o consumen en el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Recursos y demandas que inician el proceso.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Recursos Financieros<span class="sipoc-tooltip"><b>Recursos Financieros:</b> Fondos municipales y aportes externos (SernamEG, MDSF) requeridos para la ejecución presupuestaria.</span></li>
+                                <li class="sipoc-item">Marco Legal y Convenios<span class="sipoc-tooltip"><b>Marco Legal y Convenios:</b> Ley 21.430 de Garantías (OLN), convenios con SernamEG (CDM, MJH), Ley Nº 20.595 y DS N° 29 (PV).</span></li>
+                                <li class="sipoc-item">Necesidades de la Comunidad<span class="sipoc-tooltip"><b>Necesidades de la Comunidad:</b> Demandas sobre violencia/maltrato (AM, CDM, VDV), problemas de salud mental (CC, Infancia, Juventud), necesidad de autonomía económica y capacitación (MJH, SM).</span></li>
+                                <li class="sipoc-item">Población Objetivo Asignada<span class="sipoc-tooltip"><b>Población Objetivo Asignada:</b> Nóminas de usuarios potenciales asignadas por el MDSF (PV).</span></li>
+                                <li class="sipoc-item">Condición de Ingreso Específica<span class="sipoc-tooltip"><b>Condición de Ingreso Específica:</b> Voluntad de la persona para ser beneficiaria y participar activamente.</span></li>
+                            </ul>
+                        </div>
+            
+                        <!-- P: PROCESO -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">P: Proceso 🔄</h3>
+                                <span class="tooltip-text"><b>(Process)</b> Las actividades clave que transforman las entradas en salidas.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Pasos clave para transformar las entradas.</p>
+                            <ol class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Detección y Acogida<span class="sipoc-tooltip"><b>1. Detección y Acogida:</b> Recepción de la demanda por diversos canales: Demanda espontánea en oficina, reportes de Seguridad Ciudadana/RPM 1416, oficios y derivaciones de Tribunales.</span></li>
+                                <li class="sipoc-item">Diagnóstico y Evaluación<span class="sipoc-tooltip"><b>2. Diagnóstico y Evaluación:</b> vulnerabilidad/pobreza (PV, CAD), diagnóstico biopsicosocial (OLN), evaluación jurídica y penal (VDV), y verificación de criterios de baja complejidad (CC).</span></li>
+                                <li class="sipoc-item">Intervención Especializada<span class="sipoc-tooltip"><b>3. Intervención Especializada:</b> Realización de sesiones individuales y grupales (PV, CC). Intervención en crisis (VDV). Ejecución de Talleres formativos, de capacitación y oficios (AM, SM, MJH, Juventud, Infancia).</span></li>
+                                <li class="sipoc-item">Articulación y Redes<span class="sipoc-tooltip"><b>4. Articulación y Redes:</b> Liderazgo de la Mesa Comunal Interinstitucional (OLN). Coordinación para derivaciones con Redes de Salud (CAD, CC). Articulación con empresas y OMIL para empleabilidad (MJH).</span></li>
+                                <li class="sipoc-item">Actividades Comunitarias<span class="sipoc-tooltip"><b>5. Actividades Comunitarias:</b> Ejecución de actividades masivas y recreativas (Día del Pollo, Corridas, Ferias) (AM, Juventud, SM). Promoción Territorial y Difusión de derechos (OLN, Infancia, CDM)</span></li>
+                            </ol>
+                        </div>
+            
+                        <!-- O: SALIDAS -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">O: Salidas 📤</h3>
+                                <span class="tooltip-text"><b>(Output)</b> El producto o servicio que es el resultado directo del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Resultados directos y tangibles del proceso.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Apoyo Psicosocial Especializado<span class="sipoc-tooltip"><b>Apoyo Psicosocial Especializado:</b> Tratamiento psicológico y terapias complementarias (CC, SM), contención psicoemocional (VDV), atención social e informes (AM, Infancia).</span></li>
+                                <li class="sipoc-item">Protección y Garantía de Derechos<span class="sipoc-tooltip"><b>Protección y Garantía de Derechos:</b> Preservación o restitución del ejercicio de derechos (OLN), apoyo jurídico, asesoría legal y representación judicial (AM, VDV, CDM, CC)</span></li>
+                                <li class="sipoc-item">Desarrollo de Autonomía Económica<span class="sipoc-tooltip"><b>Desarrollo de Autonomía Económica:</b> Fortalecimiento de habilidades laborales, capacitación en oficios y postulación a fondos de inversión para Mujeres Jefas de Hogar y mujeres en general (MJH, SM).</span></li>
+                                <li class="sipoc-item">Integración Social y Participación<span class="sipoc-tooltip"><b>Integración Social y Participación:</b> Promoción de la participación ciudadana (AM, Juventud), fomento del protagonismo infantil y conformación de Consejos Consultivos (OLN, Infancia), integración social para prevenir la soledad (PV, CAD).</span></li>
+                                <li class="sipoc-item">Infraestructura y Apoyo Básico<span class="sipoc-tooltip"><b>Infraestructura y Apoyo Básico:</b> Provisión de alimentación y espacios de encuentro diurno (CAD), uso de sedes vecinales.</span></li>
+                            </ul>
+                        </div>
+            
+                        <!-- C: CLIENTES -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">C: Clientes 👥</h3>
+                                <span class="tooltip-text"><b>(Customer)</b> Quien recibe la salida o el resultado final del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Beneficiarios finales del proceso.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Población Segmentada<span class="sipoc-tooltip"><b>Población Segmentada:</b> Residentes de La Florida por edad: Adultos Mayores (60+ y 65+ en PV/CAD), Adultos (18-80) (CC), NNA (gestación a 17a 11m) (OLN, Infancia), Jóvenes (15-29 años) (Juventud).</span></li>
+                                <li class="sipoc-item">Población Vulnerable<span class="sipoc-tooltip"><b>Población Vulnerable:</b> Víctimas de delitos violentos (directas e indirectas), personas mayores en situación de pobreza o aislamiento (PV, CAD), NNA en riesgo o con vulneración de derechos (OLN, Infancia).</span></li>
+                                <li class="sipoc-item">Mujeres<span class="sipoc-tooltip"><b>Mujeres:</b> víctimas de violencia de pareja/ex pareja (CDM), mujeres que buscan empoderamiento (SM), Mujeres Jefas de Hogar.</span></li>
+                                <li class="sipoc-item">Redes y Organizaciones<span class="sipoc-tooltip"><b>Redes y Organizaciones:</b> Organizaciones comunitarias, clubes de adultos mayores, centros de estudiantes, organizaciones de mujeres, empresas privadas, Fiscalía, Tribunales de Familia.</span></li>
+                                <li class="sipoc-item">Agentes Estratégicos<span class="sipoc-tooltip"><b>Agentes Estratégicos:</b> Docentes, educadores, equipos de salud, equipos directivos, y personal de la red municipal que trabaja con las poblaciones objetivo.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Panel 2: Adulto Mayor -->
+            <div id="adulto-mayor-panel" role="tabpanel" aria-labelledby="adulto-mayor-tab" class="tab-content">
+                <section>
+                    <h2 class="section-title text-center">Programa Adulto Mayor</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <!-- S: Proveedores (Adulto Mayor) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">S: Proveedores 🏛️</h3>
+                                <span class="tooltip-text"><b>(Supplier)</b> Quien suministra los recursos o insumos clave para el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Entidades que financian y apoyan al programa.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Recursos Financieros<span class="sipoc-tooltip"><b>Recursos Financieros:</b> Municipalidad de La Florida (Aporte íntegro de M$340.377).</span></li>
+                                <li class="sipoc-item">Recursos Humanos<span class="sipoc-tooltip"><b>Recursos Humanos:</b> Personal de la Sección del Adulto Mayor (Abogados, Trabajadores Sociales, Gestores Territoriales, Monitores, Personal Administrativo).</span></li>
+                                <li class="sipoc-item">Redes Externas<span class="sipoc-tooltip"><b>Redes Externas:</b> Tribunal, Carabineros, Hospital, SENAMA, Instituciones Públicas, UCAM.</span></li>
+				<li class="sipoc-item">Proveedores<span class="sipoc-tooltip"><b>Proveedores:</b> Empresas con experiencia en producción de eventos masivos.</span></li>
+                            </ul>
+                        </div>
+                        <!-- I: Entradas (Adulto Mayor) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">I: Entradas 📥</h3>
+                                <span class="tooltip-text"><b>(Input)</b> Los recursos, materiales o información que se transforman o consumen en el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Demandas y recursos que activan el apoyo.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Recursos Financieros<span class="sipoc-tooltip"><b>Recursos Financieros:</b> Aporte municipal total.</span></li>
+                                <li class="sipoc-item">Demandas de la Comunidad<span class="sipoc-tooltip"><b>Demandas de la Comunidad:</b> Necesidades sociales, judiciales (maltrato/violencia), de esparcimiento y de uso de tiempo libre.</span></li>
+                                <li class="sipoc-item">Población en Riesgo<span class="sipoc-tooltip"><b>Población en Riesgo.</b> Adultos mayores afectados por carencias económicas, vulneración familiar, soledad y aislamiento social.</span></li>
+				<li class="sipoc-item">Metas del Proyecto<span class="sipoc-tooltip"><b>Metas del Proyecto:</b> Indicadores de difusión, evaluación de casos derivados y catastro de adultos mayores vinculados (100% de metas establecidas).</span></li>
+                            </ul>
+                        </div>
+                        <!-- P: Proceso (Adulto Mayor) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">P: Proceso 🔄</h3>
+                                <span class="tooltip-text"><b>(Process)</b> Las actividades clave que transforman las entradas en salidas.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Pasos para la intervención y recreación.</p>
+                            <ol class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Detección y Vinculación<span class="sipoc-tooltip"><b>1. Detección y Vinculación:</b> Recepción de demandas (espontáneas, tribunales, asambleas informativas).</span></li>
+                                <li class="sipoc-item">Diagnóstico y Orientación<span class="sipoc-tooltip"><b>2. Diagnóstico y Orientación:</b> Evaluación de casos sociales/judiciales, orientación y asesoría legal.</span></li>
+                                <li class="sipoc-item">Intervención<span class="sipoc-tooltip"><b>3. Intervención y Ejecución:</b> Entrega de recursos, talleres, apoyo en beneficios sociales, y realización de actividades masivas (ej. Día del Pollo, Pasamos agosto).</span></li>
+                                <li class="sipoc-item">Talleres y Actividades<span class="sipoc-tooltip"><b>4. Seguimiento y Evaluación:</b> Seguimiento de casos, medición de indicadores y reconocimiento de logros (ej. Finalización de Talleres).</span></li>
+                            </ol>
+                        </div>
+                        <!-- O: Salidas (Adulto Mayor) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">O: Salidas 📤</h3>
+                                <span class="tooltip-text"><b>(Output)</b> El producto o servicio que es el resultado directo del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Resultados del apoyo y las actividades.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Apoyo Integral<span class="sipoc-tooltip"><b>Apoyo Integral:</b> Apoyo social, jurídico, psicológico y territorial entregado.</span></li>
+                                <li class="sipoc-item">Reducción de Vulnerabilidad<span class="sipoc-tooltip"><b>Reducción de Vulnerabilidad:</b> Intervención jurídica y psicosocial para reducir la violencia y el maltrato.</span></li>
+                                <li class="sipoc-item">Participación activa en talleres<span class="sipoc-tooltip"><b>Participación activa en talleres.</b> Promoción de la participación, generación de lazos afectivos, revitalización de la vida social y acceso a jornadas de recreación.</span></li>
+                                <li class="sipoc-item">Espacios de encuentro<span class="sipoc-tooltip"><b>Espacios de encuentro y recreación.</b> Elaboración de informes sociales y jurídicos.</span></li>
+                            </ul>
+                        </div>
+                        <!-- C: Clientes (Adulto Mayor) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">C: Clientes 👥</h3>
+                                <span class="tooltip-text"><b>(Customer)</b> Quien recibe la salida o el resultado final del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Beneficiarios directos del programa.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Población Objetivo<span class="sipoc-tooltip"><b>Población Objetivo:</b> Adultos mayores de 60 años o más de La Florida (aprox. 35.000 beneficiarios).</span></li>
+                                <li class="sipoc-item">Segmento de Vulnerabilidad<span class="sipoc-tooltip"><b>Segmento de Vulnerabilidad:</b> Adultos mayores en situación de vulnerabilidad social.</span></li>
+				<li class="sipoc-item">Organizaciones<span class="sipoc-tooltip"><b>Organizaciones:</b> Clubes de adultos mayores y organizaciones que postulan proyectos.</span></li>
+                                <li class="sipoc-item">Entidades Colaboradoras<span class="sipoc-tooltip"><b>Entidades Colaboradoras:</b> SENAMA (para postulaciones a ELEAM).</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Panel 3: OLN -->
+            <div id="oln-panel" role="tabpanel" aria-labelledby="oln-tab" class="tab-content">
+                <section>
+                    <h2 class="section-title text-center">Oficina Local de la Niñez (OLN)</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <!-- S: Proveedores (OLN) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">S: Proveedores 🏛️</h3>
+                                <span class="tooltip-text"><b>(Supplier)</b> Quien suministra los recursos o insumos clave para el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Entidades que financian y derivan casos.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Financiamiento Externo<span class="sipoc-tooltip"><b>Financiamiento Externo:</b> Aporte de $606.354.111 para el proyecto.</span></li>
+                                <li class="sipoc-item">Recursos Humanos Especializados<span class="sipoc-tooltip"><b>Recursos Humanos Especializados:</b> Coordinadores, gestores territoriales y gestores de caso (incluyendo abogados).</span></li>
+                                <li class="sipoc-item">Redes Institucionales<span class="sipoc-tooltip"><b>Redes Institucionales:</b> Tribunal de Familia (para resoluciones judiciales), SENAPRED (para seguimiento de egresados), Subsistema Chile Crece Contigo, y programas sociales.</span></li>
+				<li class="sipoc-item">Instituciones Educativas y de Salud<span class="sipoc-tooltip"><b>Instituciones Educativas y de Salud:</b> JUNJI, INTEGRA, JUNAEB, establecimientos educacionales (para promoción y diagnóstico).</span></li>
+                            </ul>
+                        </div>
+                        <!-- I: Entradas (OLN) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">I: Entradas 📥</h3>
+                                <span class="tooltip-text"><b>(Input)</b> Los recursos, materiales o información que se transforman o consumen en el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Marco legal y población asignada.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Marco Legal<span class="sipoc-tooltip"><b>Marco Legal:</b> Ley 21.430 de Garantías y Protección Integral de la Niñez y Adolescencia.
+</span></li>
+                                <li class="sipoc-item">Recursos Financieros<span class="sipoc-tooltip"><b>Recursos Financieros:</b> Aporte municipal de 89.220.544 y aporte externo totalizando∗∗695.574.655**.</span></li>
+                                <li class="sipoc-item">Información de Casos<span class="sipoc-tooltip"><b>Información de Casos:</b> Recepción de amenazas o vulneraciones de derechos.</span></li>
+                                <li class="sipoc-item">Necesidades Comunitarias<span class="sipoc-tooltip"><b>Necesidades Comunitarias:</b> Prioridades locales definidas para la política de niñez.</span></li>
+                            </ul>
+                        </div>
+                        <!-- P: Proceso (OLN) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">P: Proceso 🔄</h3>
+                                <span class="tooltip-text"><b>(Process)</b> Las actividades clave que transforman las entradas en salidas.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Pasos para la protección de derechos.</p>
+                            <ol class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">1. Gestión Integrada de Casos (GIC)<span class="sipoc-tooltip"><b>1. Gestión Integrada de Casos (GIC):</b> Recepción de amenazas/vulneraciones de derechos (Admisibilidad), Diagnóstico Biopsicosocial, diseño de Plan de Intervención Personalizado (PIP), y Ejecución del PIP.</span></li>
+                                <li class="sipoc-item">2. Coordinación Intersectorial<span class="sipoc-tooltip"><b>2. Coordinación Intersectorial:</b> Liderazgo de la Mesa Comunal Interinstitucional para articular la promoción, prevención y protección de derechos de NNA.</span></li>
+                                <li class="sipoc-item">3. Promoción Territorial<span class="sipoc-tooltip"><b>>3. Promoción Territorial:</b> Acciones de sensibilización, socio-educación y difusión de derechos de NNA a nivel comunitario.</span></li>
+                                <li class="sipoc-item">4. Fomento de Participación<span class="sipoc-tooltip"><b>4. Fomento de Participación:</b> Conformación de un Consejo Consultivo de NNA para promover su participación activa.</span></li>
+                            </ol>
+                        </div>
+                        <!-- O: Salidas (OLN) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">O: Salidas 📤</h3>
+                                <span class="tooltip-text"><b>(Output)</b> El producto o servicio que es el resultado directo del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Resultados de la intervención.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Protección de Derechos<span class="sipoc-tooltip"><b>Protección de Derechos:</b> Preservación o restitución del ejercicio de los derechos de NNA.</span></li>
+                                <li class="sipoc-item">Articulación de Redes<span class="sipoc-tooltip"><b>Articulación de Redes:</b> Coordinación y colaboración entre instituciones y organizaciones del territorio.</span></li>
+                                <li class="sipoc-item">Planes de Intervención (PIP)<span class="sipoc-tooltip"><b>Planes de Intervención (PIP):</b> Planes personalizados de apoyo y acompañamiento familiar.</span></li>
+                                <li class="sipoc-item">Habilitación Local<span class="sipoc-tooltip"><b>Habilitación Local:</b> Implementación del dispositivo local del Sistema de Garantías y Protección Integral de Derechos.</span></li>
+                            </ul>
+                        </div>
+                        <!-- C: Clientes (OLN) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">C: Clientes 👥</h3>
+                                <span class="tooltip-text"><b>(Customer)</b> Quien recibe la salida o el resultado final del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Beneficiarios de la protección.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Población Objetivo<span class="sipoc-tooltip"><b>Población Objetivo:</b> Todos los niños, niñas y adolescentes (desde su nacimiento hasta los 18 años) de La Florida.</span></li>
+                                <li class="sipoc-item">NNA con Vulneración<span class="sipoc-tooltip"><b>NNA con Vulneración:</b> Niños, niñas y adolescentes en riesgo o con vulneración de derechos.</span></li>
+                                <li class="sipoc-item">Adultos Significativos<span class="sipoc-tooltip"><b>Adultos Significativos:</b> Padres/adultos significativos, docentes y educadores.</span></li>
+				<li class="sipoc-item">Organizaciones y Redes<span class="sipoc-tooltip"><b>Organizaciones y Redes:</b> Instituciones, organizaciones y la red ampliada de niñez que trabajan con NNA.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Panel 4: CDM -->
+            <div id="cdm-panel" role="tabpanel" aria-labelledby="cdm-tab" class="tab-content">
+                <section>
+                    <h2 class="section-title text-center">Centro de la Mujer (CDM)</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                        <!-- S: Proveedores (CDM) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">S: Proveedores 🏛️</h3>
+                                <span class="tooltip-text"><b>(Supplier)</b> Quien suministra los recursos o insumos clave para el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Entidades que financian y colaboran.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Financiamiento Externo<span class="sipoc-tooltip"><b>Financiamiento Externo:</b> SernamEG (Aporte de $147.760, sujeto a convenios).</span></li>
+                                <li class="sipoc-item">Financiamiento Municipal<span class="sipoc-tooltip"><b>Financiamiento Municipal:</b> Municipalidad de La Florida (Aporte de $96.348).</span></li>
+                                <li class="sipoc-item">Recursos Humanos<span class="sipoc-tooltip"><b>Recursos Humanos:</b> Profesionales especializados (Trabajadores/as sociales, psicólogos/as, abogados/as, técnicos) con enfoque de género y experiencia en VCM.</span></li>
+                                <li class="sipoc-item">Organizaciones de la Sociedad Civil<span class="sipoc-tooltip"><b>Organizaciones de la Sociedad Civil:</b> Organizaciones educativas para acciones preventivas.</span></li>
+                            </ul>
+                        </div>
+                        <!-- I: Entradas (CDM) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">I: Entradas 📥</h3>
+                                <span class="tooltip-text"><b>(Input)</b> Los recursos, materiales o información que se transforman o consumen en el proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Demandas y población objetivo.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Recursos Financieros<span class="sipoc-tooltip"><b>Recursos Financieros:</b> Aporte municipal ($96.348) y externo (SernamEG).</span></li>
+                                <li class="sipoc-item">Demanda de Atención<span class="sipoc-tooltip"><b>Demanda de Atención:</b> Denuncias o consultas de mujeres que viven violencia de pareja o ex pareja.</span></li>
+                                <li class="sipoc-item">Marco Legal y Metodológico<span class="sipoc-tooltip"><b>Marco Legal y Metodológico:</b> Convenio con SernamEG y experiencia en abordaje de Violencia Contra las Mujeres (VCM/VG).</span></li>
+                                <li class="sipoc-item">Estadísticas Locales<span class="sipoc-tooltip"><b>Estadísticas Locales:</b> Datos de alta prevalencia de VIF contra mujeres en la comuna.</span></li>
+                            </ul>
+                        </div>
+                        <!-- P: Proceso (CDM) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">P: Proceso 🔄</h3>
+                                <span class="tooltip-text"><b>(Process)</b> Las actividades clave que transforman las entradas en salidas.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Pasos de la atención y prevención.</p>
+                            <ol class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">1. Recepción y Orientación<span class="sipoc-tooltip"><b>1. Recepción y Orientación:</b> Atención, contención, protección y reparación psico-socio-legal (incluyendo representación judicial).</span></li>
+                                <li class="sipoc-item">2. Evaluación y Protección<span class="sipoc-tooltip"><b>>2. Evaluación y Protección:</b> Evaluación del riesgo y, cuando corresponde, activación de la red de protección inmediata.</span></li>
+                                <li class="sipoc-item">3. Intervención Especializada<span class="sipoc-tooltip"><b>3. Intervención Especializada:</b> Ingreso a procesos psico-socio-legales (atención, contención, potenciación de habilidades personales, autoestima y autonomía).</span></li>
+                                <li class="sipoc-item">4. Prevención y Difusión<span class="sipoc-tooltip"><b>4. Prevención y Difusión:</b>Desarrollo de actividades preventivas, sensibilizaciones, grupos psico-socio-educativos y acto conmemorativo (ej. 25 de noviembre).</span></li>
+                            </ol>
+                        </div>
+                        <!-- O: Salidas (CDM) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">O: Salidas 📤</h3>
+                                <span class="tooltip-text"><b>(Output)</b> El producto o servicio que es el resultado directo del proceso.</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4 font-medium">Resultados de la intervención.</p>
+                            <ul class="text-gray-700 space-y-2 text-sm md:text-base">
+                                <li class="sipoc-item">Atención Integral<span class="sipoc-tooltip"><b>Atención Integral:</b> Atención, contención, protección y reparación psico-socio-legal (incluyendo representación judicial).</span></li>
+                                <li class="sipoc-item">Prevención Comunitaria<span class="sipoc-tooltip"><b>Prevención Comunitaria:</b> Acciones de prevención, sensibilización y promoción en jóvenes y la comunidad sobre la VCM/VG.</span></li>
+                                <li class="sipoc-item">Coordinación de Redes<span class="sipoc-tooltip"><b>Coordinación de Redes:</b> Participación en mesas de trabajo en VCM (Meta: 100%).</span></li>
+                                <li class="sipoc-item">Seguimiento<span class="sipoc-tooltip"><b>Seguimiento:</b> Seguimiento a usuarias egresadas.</span></li>
+                            </ul>
+                        </div>
+                        <!-- C: Clientes (CDM) -->
+                        <div class="content-sub-card h-full flex flex-col">
+                            <div class="tooltip-container">
+                                <h3 class="text-2xl font-bold mb-3" style="color: var(--color-primary-dark);">C: Clientes 👥</h3>
+                                <span class="tooltip-text"><b>(Customer)</b> Quien recibe la salida o el resultado final del proceso.</span>
+                            </div>
+                            <p class="text-s... (Tiempo restante: 23 KB)
